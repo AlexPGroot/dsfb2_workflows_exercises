@@ -2,6 +2,7 @@
 
 # Data files
 data/*
+!data/.gitkeep
 
 # MacOS files
 .DS_Store
