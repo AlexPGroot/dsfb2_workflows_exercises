@@ -1,0 +1,50 @@
+---
+title: "3_data_management"
+author: "Alex Groot"
+date: "2023-11-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r library}
+library(here)
+library(tools)
+library(tidyverse)
+```
+## 2.1
+The problem with these Excel headers is that they use characters that can cause problems and make it them more difficult to use and select. It's also just annoying that sometimes dots are used, sometimes spaces and sometimes words are just connected without spaces. Another "issue" is that the second row is just entirely left blank and the data doesn't start until the 3rd row, probably because of aesthetic reasons.
+
+## 2.2
+```How would you prepare for this analysis in R/Rstudio?```<br><br>
+By first opening the file and checking its contents. I would globally look at how the data is displayed, and check things like headers, names, data format, etc. This would be done in Excel, its intended format, first before loading the file into R.
+```Look at the contents of the file, which Excel Worksheet do you need for the analysis?```<br><br>
+The sheet "all cycles" contains the raw data
+```Which steps do you need to take to load the data into R```<br><br>
+Loading the data is easily done by using an Excel package like readxl.
+First download the file to a raw data folder inside of the project. Then put the all cycles sheet into an object in R.
+```Which steps do you need to take in reshaping the file to make the dataformat match the requirement for using `{ggplot}```<br><br>
+Tidy up the data, headers like "Raw data (600)" are not usable. Instead the variables: well, content, absorbance and time should be used. 
+```Think of a better file name```<br><br>
+salmonella_cfu_kinetics_lb_2020_10_08
+```Write a conceptual and kind and friendly, but clear reply email (in English) to the researcher, ```<br>```where you address the changes that the researcher needs to make to the file in order for you to be able to analyze this data in R.```<br><br>
+Dear researcher,
+
+Regarding the data you sent of the salmonella cfu data;
+I'd appreciate it if you were to format the data in a way that would make it more accessible for use in R. Please keep the raw data sheet as "unformatted" as possible: have the data start at the first cell and use headers without any special characters like spaces, dots and refrain from using capitals if possible.
+
+Kind regards,
+
+<br>
+```{r MD5 checksum}
+# Create list including all "to-md5" files.
+md5_list <- 
+  here::here("data/lesson_3") %>% # refer to file location
+  dir(pattern = "^MD5.*txt$", full.names = TRUE) # dir() lists files in a dir/folder, full.names is used because md5sum needs absolute directory path.
+
+md5_list %>%
+  md5sum() %>%
+  enframe() 
+```

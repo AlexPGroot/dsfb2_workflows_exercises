@@ -4,6 +4,9 @@
 data/*
 !data/gitkeep
 
+# html output
+.html
+
 # MacOS files
 .DS_Store
 
