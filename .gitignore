@@ -5,10 +5,10 @@ data/*
 !data/gitkeep
 
 # html output
-.html
+*.html
 
 # MacOS files
-.DS_Store
+*.DS_Store
 
 # History files
 .Rhistory
