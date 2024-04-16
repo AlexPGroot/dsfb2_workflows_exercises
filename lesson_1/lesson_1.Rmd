@@ -1,0 +1,188 @@
+---
+title: "Lesson 1"
+author: "Alex Groot"
+date: "2022-11-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readxl)
+library(dplyr)
+library(tidyr)
+library(here)
+library(toolboxr)
+library(ggplot2)
+library(ggsignif)
+```
+
+https://lesmaterialen.rstudio.hu.nl/workflows-reader/represintro.html
+
+## Exercise 1.2
+### Reading a strangely formatted column from an Excel file
+
+1. From within R, try downloading the following file: http://genesdev.cshlp.org/content/suppl/2009/06/11/gad.1806309.DC1/FancySuppTable2.xls Spend 5-10 minutes on trying to accomplish this. Start for instance with read_excel( path ="http://genesdev.cshlp.org/content/suppl/2009/06/11/gad.1806309.DC1/FancySuppTable2.xls", sheet = 1) and Google for possible solutions from there.
+
+Encountered problem: Can't download link directly.
+Solution: Enter link in browser for manual download.
+
+2. What problems do you encounter, when trying to import this Excel file using {readxl}?
+Perform a manual download of this file by going here:. You need the file under the link Supp Table 2.xls
+Import the manually downloaded Excel file into R
+Considering the steps you just took, why is manually downloading and importing this file a problem with regard to open science?
+
+Manually downloading is less reproducible because it offers a less direct approach to acquire the data. RNAseq data is reproducible because the data can be acquired using a FASTQDUMP for example.
+
+
+```{r 1.2}
+excel_path <- here("lesson_1/FancySuppTable2.xls")
+excel_table_1 <- read_xls(path = excel_path, sheet = 1)
+
+
+```
+
+##Exercise 1.3
+
+1. Download this file "https://ndownloader.figstatic.com/files/7148432"
+
+2. Open the file and compare the contents of the file to the Supplementary table shown here "https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1044-7#Sec1". (click on additional file 1) Look specifically at the column Example Gene Name Conversion. What do you observe? Why do you think this is happening?
+  Excel automatically formats data and turns example gene names into dates
+  
+3. Look at this article in the Microsoft help: https://support.microsoft.com/en-us/office/stop-automatically-changing-numbers-to-dates-452bd2db-cc96-47d1-81e4-72cec11c4ed8
+
+4. Change the column Example Gene Name Conversion in the file here. to text.
+
+5. Change the column named GENE SYMBOL in this file to text.
+
+6. Now try to find the wrongly converted gene called 40059 in this data file
+
+7. On the basis of your observations in this exercise: what are your conclusions about using Excel. How could you make the use of Excel safer for data collection and analysis? What would you recommend your peers? Write (in Rmd) a short recommendation on the safe use of Excel for data collection (min 200 words). Keep this advice around! If you plan on being the person at a lab that “is quite good with data” or helps out with data analysis, you will use this in the future.
+
+```{r 1.3}
+excel_1_3 <- 
+  read_xlsx(here("lesson_1/13059_2016_1044_MOESM1_ESM.xlsx"))
+
+excel_1_3
+```
+
+```{r 1.4}
+library(nlme)
+ergoStool %>% as_tibble()
+
+set.seed(123)
+plot_ergo <- ergoStool %>%
+  ggplot(aes(x = reorder(Type, effort), y = effort)) + 
+  geom_boxplot(colour = "darkgreen", outlier.shape = NA) + 
+  geom_jitter(aes(colour = reorder(Subject, -effort)), 
+              width = 0.2, size = 3) +
+  scale_colour_manual(
+    values = c(
+      "red","blue", 
+      "green", "darkblue", 
+      "darkgreen", "purple", 
+      "grey", "black", "darkgrey")
+    ) +
+  ylab("Effort (Borg scale score)") +
+  xlab("Chair type") + 
+  guides(colour=guide_legend(title="Subject id")) +
+  theme_bw()
+plot_ergo
+```
+
+##Exercise 1.4
+
+#A Can you say something about within-subject variability (note ‘Mister Blue’)?
+We can see that Mister Blue is consistently scoring higher and requires lots of effort to get out of every chair compared to other subjects. We have no information regarding the subjects but mister blue could just be less nimble or perhaps even disabled in some way.
+
+#B Can you say something about between-subject variability (note ‘Mister Green,’ vs ‘Mister Black’)?
+Mister Green's data contains a lot of variation and seems to be able to get out of chair T1 with ease, yet seems to be one of the highest effort requiring subjects for T3 and T4.
+
+Mister Black consistently is able to get out of chairs with less effort for every type.
+
+#C Which chair type takes, on average the biggest effort to arise from?
+The graph uses a Borg scale, meaning higher score = more effort.
+Chair T2 requires the most effort on average to get out of.
+
+#D Looking at the code, why do you think the x-axis is not displaying the Chair type in a numeric order?
+The graph is ordered based on the results, with least effort on the left and increasingly more effort to the right.
+
+```{r 1.6.6}
+ergo_model <- lme(
+  data = ergoStool, # the data to be used for the model
+  fixed = effort ~ Type, # the dependent and fixed effects variables
+  random = ~1 | Subject # random intercepts for Subject variable
+)
+
+plot_ergo_slopes <- ergoStool %>%
+  ggplot(aes(x = reorder(Type, effort), y = effort)) + 
+  geom_jitter(aes(colour = reorder(Subject, -effort)), 
+              width = 0.2, size = 3) +
+  geom_smooth(aes(group = Subject, colour = Subject), method = "lm", se = FALSE) +
+  scale_colour_manual(
+    values = c(
+      "red","blue", 
+      "green", "darkblue", 
+      "darkgreen", "purple", 
+      "grey", "black", "darkgrey")
+    ) + 
+  ylab("Effort (Borg scale score)") +
+  xlab("Chair type") + 
+  guides(colour=guide_legend(title="Subject id")) +
+  theme_bw()
+plot_ergo_slopes
+
+result <- ergo_model %>% summary() 
+result$tTable %>% as.data.frame() %>% knitr::kable()
+
+plot(ergo_model) ## type = 'pearson' (standardized residuals)
+```
+
+```{r Masterclass top tier publication grade graph}
+# install.packages("ggsignif")
+p_values <- result$tTable %>% as.data.frame()
+annotation_df <- data.frame(Type=c("T1", "T2"), 
+                            start=c("T1", "T1"), 
+                            end=c("T2", "T3"),
+                            y=c(16, 14),
+                            label=
+                              paste("p-value:",
+                              c(
+                              formatC(
+                                p_values$`p-value`[2], digits = 3),
+                              formatC(
+                                p_values$`p-value`[3], digits = 3)
+                              )
+                            )
+                          )
+                            
+set.seed(123)
+ergoStool %>%
+  ggplot(aes(x = reorder(Type, effort), 
+             y = effort)) + 
+  geom_boxplot(colour = "darkgreen", 
+               outlier.shape = NA) + 
+  geom_jitter(aes(
+    colour = reorder(Subject, -effort)), 
+    width = 0.2, 
+    size = 3) +
+  scale_colour_manual(
+    values = c(
+      "red", "blue","green", 
+      "darkblue", "darkgreen", 
+      "purple", "grey", "black", 
+      "darkgrey")) +
+  ylab("Effort (Borg scale score)") +
+  xlab("Chair type") + 
+  guides(colour=guide_legend(title="Subject id")) +
+  ylim(c(6,20)) +
+  geom_signif(
+    data=annotation_df,
+    aes(xmin=start, 
+    xmax=end, 
+    annotations=label, 
+    y_position=y),
+    textsize = 5, vjust = -0.2,
+    manual=TRUE) +
+  theme_bw() -> plot_ergo
+plot_ergo
+```

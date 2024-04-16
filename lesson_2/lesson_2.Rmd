@@ -1,0 +1,128 @@
+---
+title: "lesson_2"
+author: "Alex Groot"
+date: "2022-11-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tools)
+library(here)
+library(tibble)
+library(tidyr)
+library(readr)
+```
+
+## Exercise 2.1
+### what is wrong with this file name and its headers? can you spot another problem with the data sheet?
+
+Filename utilizes spaces and capital letters.
+Data sheet has a blank row between the headers and the data, some of the data seemingly missing or not filled in because the formatting uses the 3rd row for different data.
+The column names contain capital letters, spaces, and is inconsitent with the way it uses them: e.g. "AanvragerID" and "Patient ID" instead of having "aanvrager_id" and "patient_id", or just "aanvrager" and "patient".
+
+## Exercise 2.2
+### Imagine you receive a file attached to an email from a researcher in your research group called:
+
+`salmonella CFU kinetics OD600 in LB van ipecs 8okt2020 kleur.xlsx`
+
+### The file is located in the course ./data folder.
+
+### You are requested to run an analysis on the raw data in this file (sheet named ‘All Cycles’). It contains data from a plate reader experiment where wells are measured over time. The researcher asks you to generate a plot per sample. No other information was provided in the original email.
+
+### Describe the following steps in an RMarkdown file. You do not need to write the R code for the actual analysis at this point - we will do that later in another exercise in this lesson. Answer these questions in your markdown file with exercises.
+
+### 1. How would you prepare for this analysis in R/Rstudio?
+First we open the file in Excel to see what the data and the structure is like.
+We then make a project folder for R for this analysis. The project folder will contain the markdown file and a knitted html. In a separate "raw data" folder we add the downloaded excel file. This will also make it easier to perform analysis and the loading of data using `here` so we could potentially even `.zip` up the data and send it to others.
+
+### 2. Look at the contents of the file, which Excel Worksheet do you need for the analysis?
+The first sheet "all cycles" contains all the raw data, this would be the preferred data to use for the analysis.
+
+### 3. Which steps do you need to take to load the data into R
+Load the data, check the data, then perform steps to tidy the data considering its use of headers and time.
+
+### 4. Which steps do you need to take in reshaping the file to make the dataformat match the requirement for using `{ggplot}
+We'd need a tidy data format to properly plot the data with columns containing:
+Sample name, Time, Data point.
+
+### 5. Think of a better file name
+salmonella CFU kinetics OD600 in LB van ipecs 8okt2020 kleur.xlsx
+
+2020_10_08_salmonella_cfu_kineticcs.xlsx
+
+leave the OD600, LB and ipecs in the metadata
+
+### 6. Write a conceptual and kind and friendly, but clear reply email (in English) to the researcher, where you address the changes that the researcher needs to make to the file in order for you to be able to analyze this data in R.
+
+Dear Researcher,
+
+I have received the salmonella kinetics data you sent for me to analyze, however I'd like for you to change the formatting of the data so it would be easier to perform the analysis.
+Please use a more clear way to name the data, without using spaces. Refrain from using experimental setup in the filename and add those to a metadata file instead and use the minimum amount of words needed to describe the experimental data, preferably starting with the date in the YYYY_MM_DD format. 
+To make the data itself easier to analyze, having a data sheet that exclusively contains the raw data and a header would be optimal. Just add the sample names, time and the raw data points itself.
+
+Kind regards.
+
+
+```{r}
+library(tools)
+md5_ex1_raw <- tools::md5sum(here::here("lesson_2/md5_examples/MD5_exampledata_1.txt"))
+
+md5_ex1_raw %>% tibble::enframe() -> md5sums_ex1
+
+
+#library(tools)
+
+myDir <- here("lesson_2", "md5_examples")
+fileNames <- list.files(myDir, recursive = TRUE)
+
+md5sum(file.path(myDir, fileNames)) %>% enframe() -> md5sums_all
+md5sums_all$filename <- fileNames
+md5sums_all %>% select(filename,value)
+```
+### Exercise 2.4
+### Calculating and checking md5sums checksums in R
+### For the data in this exercise use the file toxrefdb_nel_lel_noael_loael_summary_AUG2014_FOR_PUBLIC_RELEASE.csv
+
+### Determine the md5sums of the file. Save the checksums to a file [write a piece of R code]
+
+### Upload the file to the Rstudio server and check again. Again, save the resulting md5sums in a file. Do the md5sums you calculated on the server and the md5sums of the local file match?
+
+### Download the md5 file you just generated on the server (or upload the one you generated locally). Can you think of a way to check in an R script whether they are the same? Write the script and save it in a .R file
+
+```{r}
+# calculate md5sums for file "toxrefdb_nel_lel_noael_loael_summary_AUG2014_FOR_PUBLIC_RELEASE.csv"
+md5sum(here(
+  "lesson_2/toxrefdb_nel_lel_noael_loael_summary_AUG2014_FOR_PUBLIC_RELEASE.csv")) %>%
+  enframe() -> md5sums_toxref
+
+md5sums_toxref %>% # write as dataframe for easy access
+  write_csv(here(
+      "lesson_2/toxrefdb_nel_lel_noael_loael_summary_AUG2014_FOR_PUBLIC_RELEASE.md5")
+  )
+```
+### The data file for this exercise can be found here: ./data/salmonella CFU kinetics OD600 in LB van ipecs 8okt2020 kleur.xlsx
+
+### Review your answers to the previous exercise where we used this file in this lesson. Try reading the sheet called All Cycles in the Excel file.
+
+### What goes wrong with the formatting of the data if you start reading in the data from cell A1? Try solving this problem.
+### What shape of formatting would you say this data is in? Is the data tidy? Write a piece of code that creates a tidy format of this data. You also need to take a look a the sheet called layout to get information on the samples. Try generating a manual data frame that has 96 rows and a code for each sample. The experiment has been performed in duplo, so for each experimental condition there are two samples.
+
+### Now join your sample data dataframe to the raw data. Export the data as a .csv file.
+
+### Write an appropriate README.txt file that accompanies this exported csv file. Save both in your data folder of your course project. (make this folder if you don’t have it yet).
+```{r 2.9}
+readxl::excel_sheets(here("lesson_2/salmonella CFU kinetics OD600 in LB van ipecs 8okt2020 kleur.xlsx"))
+
+salmonella_raw <- read_xlsx(here("lesson_2/salmonella CFU kinetics OD600 in LB van ipecs 8okt2020 kleur.xlsx"), sheet = "All Cycles")
+
+# salmonella_raw %>% view 
+# data starts with its headers at row 10, the first 9 rows contain metadata regarding the experiment
+
+salmonella_raw <- read_xlsx(here("lesson_2/salmonella CFU kinetics OD600 in LB van ipecs 8okt2020 kleur.xlsx"), sheet = "All Cycles", skip = 11) # get data with headers
+
+read_xlsx(here("lesson_2/salmonella CFU kinetics OD600 in LB van ipecs 8okt2020 kleur.xlsx"), sheet = "layout") %>%
+  view
+
+
+```
