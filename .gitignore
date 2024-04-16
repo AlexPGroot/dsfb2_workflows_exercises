@@ -5,6 +5,8 @@ data/*
 !data/gitkeep
 *.xlsx
 *.xls
+*.zip
+*.csv
 
 # html output
 *.html
