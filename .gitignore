@@ -3,6 +3,8 @@
 # Data files
 data/*
 !data/gitkeep
+.xlsx
+.xls
 
 # html output
 *.html
