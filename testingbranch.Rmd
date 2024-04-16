@@ -1,10 +1,10 @@
-branchbranch
+1l branchbranch
 
-local info is added
+2l local info is added
 
-local testing 
-branch testing 
+3l local testing 
+4l branch testing 
 
-branchbranch
+5l branchbranch
 
-this is more local testing to try to invoke a conflict
+6l this is more local testing to try to invoke a conflict
