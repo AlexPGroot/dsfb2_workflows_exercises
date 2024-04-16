@@ -1,6 +1,8 @@
+this is a test
+
+
+some info is moved and replaced 
+
 branchbranch
 
 local testing 
-branch testing 
-
-branchbranch
