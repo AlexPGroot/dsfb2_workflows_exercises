@@ -1,6 +1,10 @@
 branchbranch
 
+local info is added
+
 local testing 
 branch testing 
 
 branchbranch
+
+this is more local testing to try to invoke a conflict
