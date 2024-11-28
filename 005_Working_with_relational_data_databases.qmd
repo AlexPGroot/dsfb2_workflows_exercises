@@ -1,0 +1,196 @@
+---
+title: "Lesson 5 Working with relational data & databases"
+
+---
+Exercise 5.1
+
+What is the first variable in the penguins_long dataframe printed above?
+```{r}
+
+```
+
+Exercise 5.2
+
+What happened? Can you think of a way we could have prevented this error a couple of steps before? Try it!
+
+```{r}
+
+```
+
+Exercise 5.3
+
+Read the output. Why does this give an empty tibble? Is that a good thing?
+```{r}
+
+```
+
+Exercise 5.4
+
+Let’s refresh your memory. Take the penguins dataset.
+
+As we all know, Adelie penguins love peanut butter, Chinstrap penguins prefer cheese and Gentoo penguins do anything for chocolate.
+
+Here is a table describing food preference:
+
+food_preference <-
+  tibble(
+    penguin_species = c("Adelie", "Chinstrap", "Gentoo"),
+    favorite_food = c("peanut butter", "cheese", "chocolate")
+  )
+
+Join this table with the penguins table in such a way that favorite_food becomes a variable within penguins. What is/are the key variables?
+```{r}
+
+```
+
+Exercise 5.5
+
+Now make a new tibble containing only the information on penguin species, sex and bill length measured in 2009 using filter and select.
+```{r}
+
+```
+
+
+Exercise 5.6
+
+To which table is the foreign key in this table linking?
+```{r}
+
+```
+
+
+Exercise 5.7
+
+Which artist has ArtistId 168?
+```{r}
+
+```
+
+
+Exercise 5.8
+
+Alter the code a bit to see the Albums in the database by the artist with ArtistId 90.
+```{r}
+
+```
+
+
+Exercise 5.9
+
+Open a new SQL console for the DBeaver Sample Database (right click on the connection name in the list on the left -> SQL Editor -> open SQL console). Copy paste the code to list the available tables and run it. Why does this give an SQL error?
+```{r}
+
+```
+
+
+Exercise 5.10
+
+Create the “konijn” and “rat” tables within the verfexperiment schema, but call them “rabbit” and “rat”. Create a third table as well, with whatever variables you like.
+```{r}
+
+```
+
+
+Exercise 5.11
+
+Here is the generic PostgeSQL code for changing the schema name:
+
+ALTER SCHEMA schema_name 
+RENAME TO new_name;
+
+Change schema “verfexperiment” to “paintexp”. After doing so, select the connection in the list on the left (postgres-localhost:5432) and press F5 to see the change.
+```{r}
+
+```
+
+
+Exercise 5.12
+
+Add 2 more rows in both tables.
+```{r}
+
+```
+
+Exercise 5.13
+
+Verify with SQL what’s in the tables now, here is the generic SQL code:
+
+SELECT * FROM table;
+
+```{r}
+
+```
+
+
+Exercise 5.14
+
+Suppose you have a table with 50 rats and want to change a specific rat’s tail colour value? What would you need to be able to use the code from the example above?
+```{r}
+
+```
+
+
+Exercise 5.15
+
+Add a column to the rabbit table named ‘rating’. You can leave it empty
+```{r}
+
+```
+
+
+Exercise 5.16
+
+Select only the customer_id column from the customer table.
+```{r}
+
+```
+
+
+Exercise 5.17
+
+What did the previous query do?
+```{r}
+
+```
+
+
+Exercise 5.18
+
+Find all the actors named ED, and have them returned to you in alphabetical order of their last name.
+
+```{r}
+
+```
+
+Exercise 5.19
+
+Find the actors with a first name starting with the letter B, sort them in alphabetical order and return their full name.
+
+```{r}
+
+```
+
+
+Exercise 5.20
+
+What does “INNER JOIN address ON address.address_id = staff.address_id” mean? How are these attributes called? What is the underlying assumption with using these keys?
+
+```{r}
+
+```
+
+
+Exercise 5.21
+
+Make a table containing only all the film titles and their category (Documentary, Horror etc..). Export this as .csv
+```{r}
+
+```
+
+Exercise 5.22
+
+Actually, we had better uploaded tidy data.. Remove the table again with
+
+dbRemoveTable(con, "penguinswide")
+
+Transform the penguins data to tidy data format (you actually already did this in the first part of this lesson) and upload it to the myfirstdb database.
