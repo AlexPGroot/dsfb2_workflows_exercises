@@ -32,8 +32,10 @@ What happened? Can you think of a way we could have prevented this error a coupl
 
 Adding an index per measured penguin will solve the issue
 ```{r}
+#| label: tbl-penguins_index
+#| tbl-cap: "penguin data"
 penguins_index <- rowid_to_column(penguins, "index")
-head(penguins_index)
+kable(head(penguins_index))
 
 penguins_tidy <-
   penguins_index %>%
@@ -77,12 +79,14 @@ food_preference <-
 Join this table with the penguins table in such a way that favorite_food becomes a variable within penguins. What is/are the key variables?
 </div class="question">
 ```{r}
+#| label: fig-penguin_food
+#| fig-cap: Penguins' favorite foods by species
 colnames(food_preference)[1] <- paste("species") # Change penguin_species to "species" to allow left_join by `species`
 food_penguins <- penguins %>%
   left_join(food_preference)
 
 food_penguins %>%
-  ggplot(aes(x = favorite_food, fill = favorite_food)) +
+  ggplot(aes(x = favorite_food, fill = species)) +
   geom_bar(width = 0.3) +
   theme_minimal() +
   labs(title = "Penguins favorite food by species")
