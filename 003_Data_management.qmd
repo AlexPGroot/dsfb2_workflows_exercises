@@ -1,0 +1,395 @@
+---
+title: "Lesson 3 Data management"
+---
+
+```{r}
+#| echo: false
+#| message: false
+
+library(here)
+library(readxl)
+library(tidyverse)
+```
+
+<div class="question">
+Exercise 3.1
+what is wrong with this file name and its headers? can you spot another problem with the data sheet?
+</div>
+
+"RAAK 91010 pat gb 19800101 1e van 2.xls".
+Title contains spaces, many capital letters, is not very descriptive and abstract version numbering; e.g. is "1e van 2" meaning first version of two or is it just the first half of the excel sheet.
+
+Furthermore the headers are on the first line of the sheet, the second line is left empty (probably) and the data starts at the 3rd line, which is not a problem but should be kept in mind. Also the variables are capitalised and contain "illegal" characters. The first thing to do when opening the data should be to properly select the headers and data and renaming the variables.
+
+<div class="question">
+Exercise 3.2
+Imagine you receive a file attached to an email from a researcher in your research group called: 
+
+`salmonella CFU kinetics OD600 in LB van ipecs 8okt2020 kleur.xlsx`
+
+The file is located in the course `./data` folder.
+
+<a href="https://github.com/DataScienceILC/tlsc-dsfb26v-20_workflows/raw/main/data/salmonella%20CFU%20kinetics%20OD600%20in%20LB%20van%20ipecs%208okt2020%20kleur.xlsx" download> Download it here.</a>
+
+You are requested to run an analysis on the raw data in this file (sheet named 'All Cycles'). It contains data from a plate reader experiment where wells are measured over time. The researcher asks you to generate a plot per sample. No other information was provided in the original email. 
+
+Describe the following steps in an RMarkdown file. You do not need to write the R code for the actual analysis at this point - we will do that later in another exercise in this lesson. Answer these questions in your markdown file with exercises.
+
+ 1. How would you prepare for this analysis in R/Rstudio?
+ 1. Look at the contents of the file, which Excel Worksheet do you need for the analysis? 
+ 1. Which steps do you need to take to load the data into R
+ 1. Which steps do you need to take in reshaping the file to make the dataformat match the requirement for using `{ggplot}
+ 1. Think of a better file name
+ 1. Write a conceptual and kind and friendly, but clear reply email (in English) to the researcher, where you address the changes that the researcher needs to make to the file in order for you to be able to analyze this data in R.
+ 
+</div> 
+
+1. 
+The easiest way to get started with preparing the data is probably by making a copy of the excel file and starting by moving some of the graphs or data around to see what the tables look like. All of the data is mostly in a "visual format" which makes it easier to look at when using excel, aside from the first sheet with all the graphs covering everything, which is mostly just data except for the headers and aforementioned graphs.
+
+2. "All Cycles".
+3. Just loading the raw data into Rstudio doesn't really require any steps, mostly just `read_xlsx`.
+4. Reshaping the data is a bit more work, after having moved the graphs it's clear that the first few rows of the table are metadata, so these should be skipped on import. Afterwards the data should be converted to tibble and then tidied for easy ggplotting.
+5. "salmonella_cfu_kin_od600_lb_ipecs_kleur-2020_10_08", depending on the file structuring we can leave out more of the filename; e.g. if all the other experiments are also "salmonella" related we could just utilize a salmonella folder and leave it out of each separate filename.
+6. The data is honestly usable as is with some row skipping and I wouldn't expect someone to take a lot of extra time to save their raw data in tidy format as this would be a bunch of extra work.
+
+<div class="question">
+Exercise 3.3
+
+There are actually 4 very similar files lying around. 
+
+<a href="https://github.com/DataScienceILC/tlsc-dsfb26v-20_workflows/raw/main/data/md5_examples/md5_examples.zip" download> Download the data here.</a>
+
+Find out which one is different from the other three using their MD5sums.
+If you want, `md5sum` can handle multiple files at the same time, but wants full paths for all of them.
+
+</div>
+
+```{bash}
+#| eval: false
+# bash
+md5sum ~/dsfb2_workflows_exercises/data_raw/data_0030/MD5* > md5sum.txt
+```
+
+```{r}
+read.table(here::here("data_raw/data_0030/md5sum.txt"),
+           col.names = c("md5", "file")) %>%
+  knitr::kable()
+```
+
+
+
+<div class="question">
+Exercise 3.4
+**Calculating and checking md5sums checksums in R**
+
+For the data in this exercise use the file  `toxrefdb_nel_lel_noael_loael_summary_AUG2014_FOR_PUBLIC_RELEASE.csv`
+
+[toxrefdb_nel_lel_noael_loael_summary_AUG2014_FOR_PUBLIC_RELEASE.csv](data/toxrefdb_nel_lel_noael_loael_summary_AUG2014_FOR_PUBLIC_RELEASE.csv)
+
+<!-- <a href="https://github.com/DataScienceILC/tlsc-dsfb26v-20_workflows/raw/main/data/toxrefdb_nel_lel_noael_loael_summary_AUG2014_FOR_PUBLIC_RELEASE.csv" download> Download the data here.</a> -->
+
+<!-- [On our github repo](https://github.com/DataScienceILC/tlsc-dsfb26v-20_workflows/raw/main/data/) -->
+
+ (a) Determine the md5sums of the file. Save the checksums to a file [write a piece of R code] 
+
+<details><summary>Click for the answer</summary>
+```{r}
+#| eval: false
+## (a)
+# calculate md5sums for file "toxrefdb_nel_lel_noael_loael_summary_AUG2014_FOR_PUBLIC_RELEASE.csv"
+tools::md5sum(
+  here::here(
+    "data",
+    "toxrefdb_nel_lel_noael_loael_summary_AUG2014_FOR_PUBLIC_RELEASE.csv"
+  )
+) %>%
+  enframe() -> md5sums_toxref
+
+
+
+md5sums_toxref %>% # write as dataframe for easy access
+  readr::write_csv(
+    here::here(
+      "data",
+      "toxrefdb_nel_lel_noael_loael_summary_AUG2014_FOR_PUBLIC_RELEASE.md5")
+  )
+
+
+```
+
+</details>
+
+ (b) Upload the file to the Rstudio server and check again. Again, save the resulting md5sums in a file. Do the md5sums you calculated on the server and the md5sums of the local file match?
+ 
+<details><summary>Click for the answer</summary>
+You should get r md5sums_toxref$value as md5sums on both the server and locally
+</details>
+ 
+<!-- <details><summary>Click for the answer</summary> -->
+
+<!-- ``` -->
+<!-- # (b) -->
+<!-- # I recommend using Git Bah for Windows [Could not make it work on Win-PowerShell] -->
+<!-- # see: https://stackoverflow.com/questions/478722/what-is-the-best-way-to-calculate-a-checksum-for-a-file-that-is-on-my-machine -->
+<!-- # https://stackoverflow.com/questions/10521061/how-to-get-an-md5-checksum-in-powershell -->
+<!-- ## In GitBash for Windows, this worked: -->
+
+<!-- CertUtil -hashfile toxrefdb_nel_lel_noael_loael_summary_AUG2014_FOR_PUBLIC_RELEASE.csv MD5 > toxrefdb_nel_lel_noael_loael_summary_AUG2014_FOR_PUBLIC_RELEASE_LOCAL.md5 -->
+
+<!-- # Mac/Linux -->
+<!-- md5sum <pathToFileToCheck> > <pathToFileToCheck.md5> -->
+
+<!-- ``` -->
+<!-- </div>  -->
+
+ (c) Download the md5 file you just generated on the server (or upload the one you generated locally). Can you think of a way to check in an R script whether they are the same? Write the script and save it in a .R file
+
+<details><summary>Click for the answer</summary>
+```{r}
+#| eval: false
+# calculate checksums from local file as under (b) and write to file 
+# calculate checksums from local file as under (b) and write to file 
+# From RSTudio
+
+# load both md5sum files into R
+# you could just logically compare the two srings, but is there a better way?
+serverside <- read_csv(
+  here::here(
+    "data",
+    "toxrefdb_nel_lel_noael_loael_summary_AUG2014_FOR_PUBLIC_RELEASE.md5"
+  )
+)
+
+local <- read_lines(
+  here::here(
+    "data",
+    "toxrefdb_nel_lel_noael_loael_summary_AUG2014_FOR_PUBLIC_RELEASE_local.md5"
+  )
+) %>%
+  enframe()
+
+
+## check equality
+serverside$value == local$value[2]
+
+```
+
+</details>
+</div>
+
+<div class="question">
+Exercise 3.5
+**project data**
+
+Now look at your last laboratory project and take a look at your folder structure. Clean it! 
+
+</div>
+
+<div class="question">
+Exercise 3.6
+Let's demonstrate this principle 3 with a COVID-19 reporting example
+
+ >- Imagine we want daily reports on the number of COVID-19 cases and caused deaths
+ >- We want to be able to dynamically report data for different countries and dates to compare situations in the World
+ >- The data is available (for manual and automated download) from the European Center for Disease Control
+ >- The analysis can be coded completely from begin to end to result in the information we need
+
+Take a look at the source file in this [Github repo (click)](https://raw.githubusercontent.com/uashogeschoolutrecht/covid_demo/master/app/covid_data.Rmd){target="_blank"}
+
+Download this file to your RStudio environment and knit the file. 
+
+What do you see in the rendered html? 
+
+What happens if you change some of the parameters in the `yaml` header of the file, in particular country_code or from_to_date?
+
+</div>
+
+<div class="question">
+Exercise 3.7
+**tips**
+
+Please share all tips for fellow students on the prikbord in teams!
+
+</div>
+
+<div class="question">
+Exercise 3.8
+
+Provide study documentation and meta data for your last laboratory project.
+
+<!-- Make `/doc` and `/data` and `data_raw` folders now for all (at least) 3 of your projects this semester. Add a `data_log.xlsx` for the projecticum folder. -->
+
+While you are at it, add `/code` folders for any scripts you write (outside of the RMarkdown files) and `/R` folders for any functions you write.
+</div>
+
+<div class="question">
+Exercise 3.9
+
+**Transforming data in a reproducible way**
+
+Remember the well plate experiment? Here we will perform a transformation on the data to make the data suitable for analysis in R. We will also create a single graph showing all the data available for all samples over measured time in the experiment. 
+
+The data file for this exercise can be found here: `./data/salmonella CFU kinetics OD600 in LB van ipecs 8okt2020 kleur.xlsx`
+
+<a href="https://github.com/DataScienceILC/tlsc-dsfb26v-20_workflows/raw/main/data/salmonella%20CFU%20kinetics%20OD600%20in%20LB%20van%20ipecs%208okt2020%20kleur.xlsx" download> Download it here if you've lost it </a> and take a good look at your file management...
+
+Go over the following steps to complete this exercise. 
+
+<!-- Add the resulting RMarkdown to your portfolio bookdown project (see \@ref(bookdownportfolio)). -->
+
+ 1. Review your answers to the previous exercise where we used this file in this lesson.
+ 1. Try reading the sheet called `All Cycles` in the Excel file. 
+ 1. What goes wrong with the formatting of the data if you start reading in the data from cell A1?
+ 1. Try solving this problem. 
+ 1. What shape of formatting would you say this data is in? Is the data tidy?
+ 1. Write a piece of code that creates a tidy format of this data. You also need to take a look a the sheet called `layout` to get information on the samples. Try generating a manual data frame that has 96 rows and a code for each sample. The experiment has been performed in duplo, so for each experimental condition there are two samples. 
+ 1. Now join your `sample data` dataframe to the raw data.
+ 1. Export the data as a .csv file.
+ 1. Write an appropriate README.txt file that accompanies this exported csv file. Save both in your `data` folder of your course project. (make this folder if you don't have it yet). 
+ 
+**TIPS:
+
+ - Remember: `dplyr::pivot_longer()` and `dplyr::pivot_wider()` are very helpful when you want to reshape your data in R
+ - After reading your data into R: be sure to check the datatype of the columns
+ - Create a sample data table containing sample information for each of the 96 samples mentioned in the `All Cycles` sheet. The information you need to do this is contained in sheet `layout`
+ - the `time` variable in this dataset is a nasty one. It is recorded in an uncenventional way. You need to use some cleaning up code to transform this variable in numbers (use `str_replace_all()`, to get rid of the stupid characters like `x` and the `_`. Next you can transform this variable into hours and minutes by using `seperate()`. Be aware that there will be 'empty' cells in the `minutes` column 
+ - Do you think it is a good idea to have graphs in an Excel worksheet that contains the raw data?
+ - How would you have stored the Raw data of this experiment?
+ 
+</div>
+
+<details><summary>Click for the answer</summary>
+answer
+```{r, cache=TRUE}
+#| eval: false
+# reading in the data - without any special settings
+library(readxl)
+
+data_platereader <- read_xlsx(
+  here::here(
+    "data",
+    "salmonella CFU kinetics OD600 in LB van ipecs 8okt2020 kleur.xlsx"
+  ), sheet = "All Cycles"
+)
+## this data looks mangled because of several things: 
+# there is some metadata in the top region of the sheet
+# there is a weird looking headers (two headers?)
+
+## trying skip
+data_platereader <- read_xlsx(
+  here::here(
+    "data",
+    "salmonella CFU kinetics OD600 in LB van ipecs 8okt2020 kleur.xlsx"
+  ), sheet = "All Cycles", skip = 11
+)
+
+## clean up and fix names
+data_platereader <- data_platereader %>%
+  rename(sample = Time, well = ...1) %>%
+  janitor::clean_names()
+
+## which wells have data?
+unique(data_platereader$well)
+
+
+## create sample table
+sample_names <- data_platereader$sample
+
+mv_utr_tx100 <- rep(c("mv", "mv", "mv", "mv", 
+                      "untr", "untr", "untr", "untr", "untr",
+                      "tx100", "tx100", "tx100"), times = 8)
+
+salmonella <- read_xlsx(
+  here::here(
+    "data",
+    "salmonella CFU kinetics OD600 in LB van ipecs 8okt2020 kleur.xlsx"
+  ), sheet = "layout", range = "C5:N13"
+) %>%
+  janitor::clean_names() 
+
+# cheack data types
+map(
+  .x = salmonella,
+  typeof
+)
+
+salmonella <- salmonella %>%
+  pivot_longer(ul_sal_1:ul_sal_12,
+               names_to = "plate_column", 
+               values_to = "microliters_bacteria")
+
+## synthesize to sample table
+
+samples <- tibble(
+  well = data_platereader$well,  
+  sample = sample_names,
+  condition = mv_utr_tx100,
+  ul_salmonella = salmonella$microliters_bacteria
+)
+
+## join sample table with data
+data_join <- left_join(samples, data_platereader)
+
+## create tidy version
+data_tidy <- data_join %>%
+  pivot_longer(
+    x0_h:x24_h_5_min,
+    names_to = "time",
+    values_to = "value"
+  )
+
+## fix time variable
+data_tidy_time <- data_tidy %>%
+  mutate(time_var =
+  str_replace_all(
+    string = time,
+    pattern = "x",
+    replacement = ""
+  )) %>%
+  mutate(time_var =
+  str_replace_all(
+    string = time_var,
+    pattern = "_",
+    replacement = ""
+  )) %>%
+  mutate(time_var =
+  str_replace_all(
+    string = time_var,
+    pattern = "h",
+    replacement = ":"
+  )) %>%
+  mutate(time_var =
+  str_replace_all(
+    string = time_var,
+    pattern = "min",
+    replacement = ""
+  )) %>%
+  separate(
+    col = time_var,
+    into = c("hours", "minutes"),
+    remove = FALSE
+  ) %>%
+  mutate(
+    minutes = ifelse(minutes == "", "0", minutes)
+  ) %>%
+  mutate(minutes_passed = 60*as.numeric(hours) + as.numeric(minutes))
+
+## misingness
+data_tidy %>%
+  naniar::vis_miss()
+
+## graphs
+data_tidy_time %>%
+  group_by(condition, ul_salmonella, minutes_passed) %>%
+  summarise(mean_value = mean(value)) %>%
+  mutate(ul_salmonella = round(as.numeric(ul_salmonella), 2)) %>%
+  ggplot(aes(x = minutes_passed, y = mean_value)) +
+  geom_line(aes(colour = condition), show.legend = FALSE) +
+  facet_grid(condition ~ ul_salmonella) +
+  xlab("Time passed (minutes)") +
+  ylab("Mean AU")
+
+```
+
+</details>

@@ -1,0 +1,4 @@
+f3d2eeb79b4c24490bf08f483e5cadd3  MD5_exampledata_1.txt
+f3d2eeb79b4c24490bf08f483e5cadd3  MD5_exampledata_backupcomputercrash.txt
+a331f23fd3586f0100173bd28b1e319c  MD5_exampledata_maybethisone.txt
+f3d2eeb79b4c24490bf08f483e5cadd3  MD5_exampledata_savethisone.txt
