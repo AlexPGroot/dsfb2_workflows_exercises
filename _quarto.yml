@@ -17,7 +17,6 @@ website:
         - 003_Data_management.qmd
         - 004_Reproducible_research.qmd
         - 005_Working_with_relational_data_databases.qmd
-        - 006_Creating_R_packages.qmd
         - 007_RMarkdown_syntax.qmd
         - 008_Rmarkdown_output_formats.qmd
         - 009_Rmarkdown_parameters_&_presentations.qmd
