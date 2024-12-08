@@ -1,13 +1,14 @@
 ---
 title: "Lesson 7 RMarkdown - Syntax"
 bibliography: references.bib
-bibliographystyle: apa
 format:
   html:
     css: css/007_custom.css
 ---
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Library"
 #| message: false
 library(tidyverse)
 library(mytoolkitr)
@@ -68,28 +69,7 @@ Provide a graph depicting your rating of them on a 1-10 scale.
 Top 5 favorite Pokemon
 :::
 
-```{r}
-#| label: tbl-pkmn
-#| tbl-cap: Five Pokemon and their characteristics 
-#| eval: false
-tbl_pokemon <- tibble(name = c("Pikachu", "Mudkip", "Typhlosion", "Eevee", "Skarmory"),
-         type = c("electric", "water/ground", "fire", "normal", "flying/steel"),
-         height = c(0.4, 0.4, 1.7, 0.3, 1.7),
-         height_unit = c("m", "m", "m", "m", "m"),
-         weight = c(6.0, 7.6, 79.5, 6.5, 50.5),
-         weight_unit =c("kg", "kg", "kg", "kg", "kg"),
-         evolution_stage = factor(x = c(1, 1, 3, 1, "non"), levels = c("non", 1, 2, 3)),
-         rating = c(10, 10, 10, 8, 9))
 
-tbl_pokemon %>% kbl() %>% kableExtra::kable_paper(c("striped", "hover"), full_width = F)
-
-# http://127.0.0.1:19695/library/kableExtra/doc/awesome_table_in_html.html
-# use fitting colors for types
-# insert tiny img version in table
-# add wiki links per pokemon
-# add scaling height/weight colors
-```
-  
 
 ```{r}
 #| label: tbl-pkmn_2
@@ -317,5 +297,11 @@ Don’t knit the file yet.
 
 (note: dragging and dropping citations from zotero to your Rmarkdown file also works in a way, but puts them in a format only recognised if you knit to pdf. )
 </div class="question">
+
+This is citation test one. @wangNanoporeSequencingTechnology2021 <br>
+This is citation test two. @chenSystematicBenchmarkNanopore2021 <br>
+
+This is citations using Insert Zotero Citation add-in. <br>
+References at the bottom of the document are added automatically through "bibliography" header at the top.
 
 
