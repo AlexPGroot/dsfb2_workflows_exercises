@@ -8,8 +8,6 @@ title: "Index"
 
 <a href= 005_Working_with_relational_data_databases.qmd>005_Working_with_relational_data_databases</a>
 
-<a href= 006_Creating_R_packages.qmd>006_Creating_R_packages</a>
-
 <a href= 007_RMarkdown_syntax.qmd>007_RMarkdown_syntax</a>
 
 <a href= 008_Rmarkdown_output_formats.qmd>008_Rmarkdown_output_formats</a>
