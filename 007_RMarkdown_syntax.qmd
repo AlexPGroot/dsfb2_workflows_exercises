@@ -1,6 +1,7 @@
 ---
 title: "Lesson 7 RMarkdown - Syntax"
-
+bibliography: references.bib
+bibliographystyle: apa
 format:
   html:
     css: css/007_custom.css
