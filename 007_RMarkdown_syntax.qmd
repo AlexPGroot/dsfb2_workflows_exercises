@@ -286,13 +286,27 @@ Import some random paper from Pubmed into Zotero (drag & drop the pdf or use the
 | Modified 	| 12/7/2024, 4:12:56 PM | 
 | Tags: | Computational Biology High-Throughput Nucleotide Sequencing Nanopore Sequencing Nanopores Sequence Analysis, DNA Technology | 
 | Attachments | Full Text, PubMed entry | 
-: Metadata from Zotero {#tbl-metadata_1 .striped}
-: {tbl-colwidths="[25,75]"}
+: Metadata from Pubmed through Zotero {#tbl-metadata_1 tbl-colwidths="[25,75]" .striped}
 
 <div class="question">
 Exercise 7.4.2
 Import some pdf you rendered yourself from RMarkdown into Zotero. What metadata do you get?
 </div class="question">
+
+|  |  | 
+|:--|:--| 
+| Title | Lesson 7 RMarkdown - Syntax | 
+| Item Type | 	Journal Article | 
+| Language | 	en | 
+| Library Catalog | 	Zotero | 
+| Date Added | 	12/8/2024, 12:06:16 PM | 
+| Modified | 	12/8/2024, 12:06:16 PM | 
+| Attachments | PDF |
+: Metadata from this document as pdf through Zotero
+{#tbl-metadata_2 .striped tbl-colwidths="[25,75]"}
+
+Comparing @tbl-metadata_1 to @tbl-metadata_2 we can see that there's quite a bit more metadata available.
+Of course Zotero would need to retrieve its metadata from somewhere and as there's not a lot of data put in this quarto document there's not a lot of data to display. Also <a href="https://www.zotero.org/support/retrieve_pdf_metadata">Zotero themselves</a> state that while it is possible to retrieve data from PDF files, that using the Zotero Connector plugin is preferred as its both easier and often provides "higher quality metadata". 
 
 <div class="question">
 Exercise 7.5
@@ -302,3 +316,5 @@ Don’t knit the file yet.
 
 (note: dragging and dropping citations from zotero to your Rmarkdown file also works in a way, but puts them in a format only recognised if you knit to pdf. )
 </div class="question">
+
+
