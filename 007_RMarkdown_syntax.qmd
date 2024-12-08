@@ -1,0 +1,304 @@
+---
+title: "Lesson 7 RMarkdown - Syntax"
+
+format:
+  html:
+    css: css/007_custom.css
+---
+
+```{r}
+#| message: false
+library(tidyverse)
+library(mytoolkitr)
+library(ggplot2)
+library(viridis)
+library(knitr)
+library(kableExtra)
+library(png)
+library(magick)
+# devtools::install_github("clauswilke/ggtextures")
+library(ggtextures)
+```
+
+<div class="question">
+Exercise 7.1
+Generate a graph with ggplot (any graph you like, here are some examples) and try some options to make it colourblind-friendly. Test your figure here (Export your graph to jpeg using the export option in Rstudio (bottom right, above the graph) or ggsave() and upload the file to this website.)
+</div class="question">
+
+```{r}
+#| label: fig-mpg
+#| fig-cap: Car classes produced by manufacturers
+mpg_raw <- ggplot2::mpg
+mpg_raw$class <- as.factor(mpg_raw$class)
+
+mpg_raw %>% 
+  ggplot(aes(x = manufacturer, fill = class)) +
+  geom_bar(position = "dodge") +
+  labs(title = "Car class by Manufacturer",
+       x = "Manufacturer",
+       y = "Count"
+       ) + scale_fill_viridis_d() + theme_minimal() + theme(axis.text.x = element_text(angle = 45, vjust = 0.9, hjust=1))
+```
+
+<div class="question">
+Exercise 7.2
+Render a html-document with:
+
+Your 5 favorite Pokemon characters as images (or choose any theme you prefer as long as you include at least 5 images: Marvel, Firefly, Zelda, Jane Austen novels, your favorite Netflix shows, perhaps 13 images for 13 reasons why, whatever you like). Make sure all the images end up the same size in your html and are distributed nicely.
+
+Provide a table (note: a table is not the same as a tibble!) with some characteristics for these characters. Each pokemon should get a row in the table, with a different text colour.
+
+Provide a graph depicting your rating of them on a 1-10 scale.
+</div class="question">
+
+
+::: {#fig-pokemon layout-ncol=5}
+
+![Pikachu](images/data_0070/pikachu_spr_e_025_1.png){#fig-pikachu}
+
+![Mudkip](images/data_0070/mudkip_spr_e_258_1.png){#fig-mudkip}
+
+![Typhlosion](images/data_0070/typhlosion_spr_e_157_1.png){#fig-typhlosion}
+
+![Eevee](images/data_0070/eevee_spr_e_133_1.png){#fig-eevee}
+
+![Skarmory](images/data_0070/skarmory_spr_e_227_1.png){#fig-skarmory}
+
+Top 5 favorite Pokemon
+:::
+
+```{r}
+#| label: tbl-pkmn
+#| tbl-cap: Five Pokemon and their characteristics 
+#| eval: false
+tbl_pokemon <- tibble(name = c("Pikachu", "Mudkip", "Typhlosion", "Eevee", "Skarmory"),
+         type = c("electric", "water/ground", "fire", "normal", "flying/steel"),
+         height = c(0.4, 0.4, 1.7, 0.3, 1.7),
+         height_unit = c("m", "m", "m", "m", "m"),
+         weight = c(6.0, 7.6, 79.5, 6.5, 50.5),
+         weight_unit =c("kg", "kg", "kg", "kg", "kg"),
+         evolution_stage = factor(x = c(1, 1, 3, 1, "non"), levels = c("non", 1, 2, 3)),
+         rating = c(10, 10, 10, 8, 9))
+
+tbl_pokemon %>% kbl() %>% kableExtra::kable_paper(c("striped", "hover"), full_width = F)
+
+# http://127.0.0.1:19695/library/kableExtra/doc/awesome_table_in_html.html
+# use fitting colors for types
+# insert tiny img version in table
+# add wiki links per pokemon
+# add scaling height/weight colors
+```
+  
+
+```{r}
+#| label: tbl-pkmn_2
+#| tbl-cap: Five Pokemon and their characteristics
+tbl_pokemon_pic <- tibble(
+  sprite = "",
+  name = c("Pikachu", "Mudkip", "Typhlosion", "Eevee", "Skarmory"),
+  type = c("electric", "water/ground", "fire", "normal", "steel/flying"),
+  height = c(0.4, 0.4, 1.7, 0.3, 1.7),
+  height_unit = c("m", "m", "m", "m", "m"),
+  weight = c(6.0, 7.6, 79.5, 6.5, 50.5),
+  weight_unit = c("kg", "kg", "kg", "kg", "kg"),
+  evolution_stage = factor(x = c(1, 1, 3, 1, "non"), levels = c("non", 1, 2, 3)),
+  rating = c(10, 10, 10, 8, 9)
+)
+
+# Add custom background colors to the 'type' column (third column in display)
+tbl_pokemon_pic$type <- mapply(function(type, color) {
+  cell_spec(type, color = "white", bold = TRUE, background = color)
+}, tbl_pokemon_pic$type, c("#f8d030", "#6890f0", "#f08030", "#a8a878", "#b8b8d0"))
+
+
+tbl_pokemon_pic$name <- mapply(function(name, link) {
+  cell_spec(name, color = "#0000EE", bold = TRUE, link = link)
+}, 
+tbl_pokemon_pic$name, 
+c("https://bulbapedia.bulbagarden.net/wiki/Pikachu_(Pokémon)", 
+  "https://bulbapedia.bulbagarden.net/wiki/Mudkip_(Pokémon)", 
+  "https://bulbapedia.bulbagarden.net/wiki/Typhlosion_(Pokémon)", 
+  "https://bulbapedia.bulbagarden.net/wiki/Eevee_(Pokémon)", 
+  "https://bulbapedia.bulbagarden.net/wiki/Skarmory_(Pokémon)"))
+
+# Generate the styled table
+tbl_pokemon_pic %>%
+  kbl(booktabs = TRUE, escape = FALSE) %>% 
+  kableExtra::kable_paper(c("hover"), full_width = FALSE) %>%
+  column_spec(1, image = spec_image(c("images/data_0070/pikachu_icon.gif", 
+                                      "images/data_0070/mudkip_icon.gif", 
+                                      "images/data_0070/typhlosion_icon.gif", 
+                                      "images/data_0070/eevee_icon.gif", 
+                                      "images/data_0070/skarmory_icon.gif"), 
+                                    32, 32, res = 96))
+# http://127.0.0.1:19695/library/kableExtra/doc/awesome_table_in_html.html
+# use fitting colors for types
+# insert tiny sprite version in table
+# add wiki links per pokemon
+
+```
+In @tbl-pkmn_2 we can see the top 5 Pokemon and their characteristics such as type, height, weight and evolution stage. The names contain hyperlinks to Bulbapedia for more information. Instead of the main sprites from @fig-pokemon it contains the smaller inventory sprites.
+The Quarto cross-references provide pop-out versions of the tables and figures when hovering over them.
+Also while it is possible to do all this with r, trying to get all the data displayed like this using functions and apply for small tables like this it might be easier to just do this with html/css instead.
+
+```{r}
+#| eval: false
+plot_pkmn <- tbl_pokemon_pic
+plot_pkmn$black <- list(
+    image_read("images/data_0070/black/pikachu_spr_black.png"),
+    image_read("images/data_0070/black/mudkip_spr_black.png"),
+    image_read("images/data_0070/black/typhlosion_spr_black.png"),
+    image_read("images/data_0070/black/eevee_spr_black.png"),
+    image_read("images/data_0070/black/skarmory_spr_black.png")
+  )
+plot_pkmn$color <- c("#f8d030", "#6890f0", "#f08030", "#a8a878", "#b8b8d0")
+
+plot_pkmn_render <- plot_pkmn %>%
+  ggplot(aes(x = name,
+             y = rating,
+             image = black)) +
+  ggtextures::geom_isotype_col(ncol = 1, nrow = 1, fill = plot_pkmn$color,
+                               img_height = NULL, img_width = grid::unit(1.05, "null"))  + labs(title = "Top 5 rated Pokemon", x = "Pokemon",y = "Rating", fill = plot_pkmn$name, legend.position = "top") + theme_minimal()
+
+ggsave("images/data_0070/plot_pkmn_save.png", plot = plot_pkmn_render, height = 9, width = 9, dpi = 320)
+# ggsave is used because of the way geom_isotype_col, html and axis angle and the rendered output seem to interact.
+# the result is a string of html text of each row pushing the entire graph out of view
+```
+
+![Plot of top 5 Pokemon and their ratings](images/data_0070/plot_pkmn_save.png){#fig-plot_pkmn}
+
+<div class="header_pokemon">
+  <h1>Look at this header</h1>
+</div class="header_pokemon">
+
+<div class="body_pokemon2">
+Exercise 7.3
+Go back to your html file with the 5 favorite Pokemon (or other) images.
+
+Make a css file, and use it to change all the body text to a nice colour, and all the headers to a different colour.
+
+Make a new class containing some styling rules, and apply it to a part of your file (so you will also have to make a `<div>` somewhere in your page. Perhaps a nice text box with rainbow border containing a written statement of your love for these Pokemon)
+
+Include a link to the wikipedia page of your topic. Make the link change to a green colour when you hover over it.
+
+<a class="wiki_link" href="https://www.w3schools.com/css/css_link.asp"> W3schools link </a>
+</div class="body_pokemon2">
+In my opinion this is enough experimenting with css and html so I'd rather not globally apply changes to all the headers and body as I like the current style and layout. However if so desired it's as easy as just changing the css divs to `body{}` or `h1, h2, h3, h4, h5, h6{}`
+
+```{css}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Rainbow header code"
+div.header_pokemon{
+  height: 200px;
+  font-size: 72px;
+  font-family: cursive;
+  text-align: center;
+  color:black;
+  text-shadow: white 1px 0 1px;
+  background: linear-gradient(in hsl longer hue 45deg, red 0 0);
+}
+/* h1 overwrites by default so we inherit the css from the div to the h1 within the div*/
+div.header_pokemon h1{
+  font-size: inherit;
+  font-family: inherit;
+  text-align: inherit;
+}
+```
+
+```{css}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Animated box code"
+div.body_pokemon{
+  border: 4px red
+  border-style round;
+  background: black;
+  color: white;
+  font-family: Georgia, serif
+  font-size 14px;
+}
+/* keyframes for animation */
+@keyframes example {
+  0% {border-color: red;}
+  20% {border-color: yellow;}
+  40% {border-color: green;}
+  60% {border-color: blue;}
+  80% {border-color: purple;}
+  100% {border-color: red;}
+}
+
+/* loop animation infinitely */
+div.body_pokemon2{
+  border: 4px solid;
+  border-style: round;
+  animation-name: example;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  color: white;
+  background-color: darkred;
+  padding: 2px;
+}
+```
+
+```{css}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Link css code"
+a.wiki_link {
+  color: var(--c,blue);
+  font-size: 25px;
+}
+
+a.wiki_link:hover {
+  color: green;
+}
+```
+
+
+<div class="question">
+Exercise 7.4.1
+Import some random paper from Pubmed into Zotero (drag & drop the pdf or use the web connector). What metadata do you get?
+</div class="question">
+
+| | |
+|:------------------------|:-------------------------------------|
+| Title | Nanopore sequencing technology, bioinformatics and applications |
+| Item Type | 	Journal Article | 
+| Author 	|     Yunhao Wang | 
+| Author 	|     Yue Zhao | 
+| Author 	|     Audrey Bollas | 
+| Author 	|     Yuru Wang | 
+| Author 	 |    Kin Fai Au | 
+| Abstract | Rapid advances in nanopore technologies for sequencing single long DNA and RNA molecules have led to substantial improvements in accuracy, read length and throughput. These breakthroughs have required extensive development of experimental and bioinformatics methods to fully exploit nanopore long reads for investigations of genomes, transcriptomes, epigenomes and epitranscriptomes. Nanopore sequencing is being applied in genome assembly, full-length transcript detection and base modification detection and in more specialized areas, such as rapid clinical diagnoses and outbreak surveillance. Many opportunities remain for improving data quality and analytical approaches through the development of new nanopores, base-calling methods and experimental protocols tailored to particular applications. | 
+| Date 	    |   2021-11 | 
+| Language 	|   eng | 
+| Library Catalog | 	PubMed | 
+| Extra 	      |     PMID: 34750572 PMCID: PMC8988251 | 
+| Volume 	      | 39 | 
+| Pages 	      | 1348-1365 | 
+| Publication 	| Nature Biotechnology | 
+| DOI 	        | 10.1038/s41587-021-01108-x | 
+| Issue 	      | 11 | 
+| Journal Abbr 	| Nat Biotechnol | 
+| ISSN 	        | 1546-1696 | 
+| Date Added 	|  12/7/2024, 4:12:56 PM
+| Modified 	| 12/7/2024, 4:12:56 PM | 
+| Tags: | Computational Biology High-Throughput Nucleotide Sequencing Nanopore Sequencing Nanopores Sequence Analysis, DNA Technology | 
+| Attachments | Full Text, PubMed entry | 
+: Metadata from Zotero {#tbl-metadata_1 .striped}
+: {tbl-colwidths="[25,75]"}
+
+<div class="question">
+Exercise 7.4.2
+Import some pdf you rendered yourself from RMarkdown into Zotero. What metadata do you get?
+</div class="question">
+
+<div class="question">
+Exercise 7.5
+In your Rmd for this lesson, add a few random citations from Zotero. Put square brackets around the citation if you don’t want it “inline” but between brackets (after a sentence).
+
+Don’t knit the file yet.
+
+(note: dragging and dropping citations from zotero to your Rmarkdown file also works in a way, but puts them in a format only recognised if you knit to pdf. )
+</div class="question">
