@@ -20,7 +20,6 @@ website:
         - 007_RMarkdown_syntax.qmd
         - 008_Rmarkdown_output_formats.qmd
         - 009_Rmarkdown_parameters_&_presentations.qmd
-        - 010_Portfolio_exam.qmd
         
 
 

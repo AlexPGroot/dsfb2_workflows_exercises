@@ -1,0 +1,17 @@
+.index-box {
+  border: 2px solid #2c3e50;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background-color:  	#ecf0f1;
+}
+
+.index-box a {
+  color: #2c3e50;
+  margin-bottom: 8px;
+}
+
+.index-box a:hover {
+  color: #18bc9c;
+  text-decoration: underline;
+}

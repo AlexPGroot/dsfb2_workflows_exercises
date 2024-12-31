@@ -1,0 +1,131 @@
+---
+title: "Lesson 8 RMarkdown - Output formats"
+---
+
+```{r library}
+
+```
+
+
+<div class="question">
+
+Exercise 8.1 
+
+This exercise is adapted from [this one from r4ds here](https://r4ds.had.co.nz/r-markdown.html#exercises-71)
+
+Copy and paste the contents of Lorem.Rmd <a href="https://github.com/DataScienceILC/tlsc-dsfb26v-20_workflows/raw/main/Rmd/lorem.Rmd" download> here </a> to a .Rmd file.
+
+From this .Rmd, knit one new document for each of the three built-in formats: HTML, PDF and Word. How does the output differ? How does the input differ? (You may need to install LaTeX in order to build the PDF output — RStudio will prompt you if this is necessary.)
+</div>
+
+The output is different depending on the file format of course.
+.html output results in .html files. Quarto also has the ability to render pages as pdf and LaTeX files, which requires the quarto options: `format: pdf` and `format: latex`. Another possibility is to use `format: pdf: keep-tex: true` to get pdf output and keep `.tex` for further editing.
+
+Looks-wise html looks like a website document, pdf looks more similar too a book or paper, latex output results in a raw .tex file. All of these outputs also create their own _files folder containing graphics.
+
+Some distribution of TeX is required to have R convert the output to TeX files and TinyTeX is recommended. 
+
+PDF is a format which is a combination of text and graphics, TeX is more similar to markdown in that it is a language, which have differing syntax and capabilities. LaTeX is seen as the academic standard for its powerful precision over text/page layout and mathematical typesetting.
+However, rmarkdown, combined with quarto and its packages, css and html allows for many options regarding many other aspects. Combined with its ease of use makes it a great tool for rendering websites, documents and allows for more interactivity over LaTeX' more static documents.
+
+<div class="question">
+
+Exercise 8.2
+
+  A) What is a floating TOC?
+  B) Use Lorem.Rmd again and add a TOC
+  C) Give the TOC a set depth (toc_depth) and see what happens if you change it. (for instance `toc_depth: 2` can be set just as you set `toc_float: true` earlier.)
+  D) Also try `code_folding: hide` and `number_sections: FALSE`.
+  E) Google how to put two authors on one .Rmd, with affiliations. Put your and your labpartner's names as authors.
+  F) Apply a theme you like, but not "united".
+  G) try tabbed sections
+
+</div>
+
+```{r}
+#| eval: false
+
+# A-F
+
+---
+title: "lorem"
+format: 
+  html:
+   toc: true
+   toc-location: body
+   toc-depth: 2
+   code-fold: true
+   number-sections: true
+   theme: cosmo
+author:
+  - name: Alex Groot
+    orcid: 1730201
+    email: email@mail.com
+    affiliations:
+      - name: Hogeschool Utrecht
+  - name: Author 2
+    affiliations:
+      - name: Hogeschool Utrecht
+---
+      
+# Panel tabsets:
+      
+:::{.panel-tabset}
+### header
+    text
+### header2
+    text2
+:::
+      
+```
+
+
+<div class="question">
+Exercise 8.3
+ - Follow [these steps until "Beyond the basics".(click)](https://rmarkdown.rstudio.com/articles_docx.html)
+ - Get your word-styles-reference-01.docx to work as a style reference.
+
+</div>
+
+```{r}
+#| eval: false
+
+---
+title: "008_test_report"
+format: 
+  docx:
+    reference-doc: "word-styles-reference-01.docx" 
+---
+  
+```
+
+The rendered document in "_site/008_test_report.docx" correctly uses the references-doc and is generated with different style, such as the title being "DejaVu Math TeX Gyre" in the new file using reference, while a new document created within LibreOffice utilizes the default title "Liberation Sans".
+
+<div class="question">
+Exercise 8.4
+
+**rabbits!**
+
+Change the markers in the example above to little icons of rabbits! See [here (click)](http://rstudio.github.io/leaflet/markers.html) how to do this.
+</div>
+
+```{r}
+library(leaflet)
+library(tidyverse)
+
+rabbit_locations <- tibble( rabbitnr = c(1:5),
+                            lat  = c(52.0852,52.0832,52.08247,52.0834,52.08309),
+                            long = c(5.171109,5.171248,5.171248,5.176055,5.17268) )
+# Download free icon from "https://fonts.google.com/icons"
+# Edited to be coloured black
+rabbit_icons <- icons(
+  iconUrl = here::here("images/data_0080/cruelty_free_24dp_E8EAED_FILL0_wght400_GRAD0_opsz24.png"),
+  iconWidth = 32,
+  iconHeight = 32
+)
+
+leaflet(data = rabbit_locations) %>% addTiles() %>% 
+  addMarkers(~long, ~lat, popup = ~as.character(rabbitnr), label = ~as.character(rabbitnr), 
+             icon = rabbit_icons) # add icon
+```
+

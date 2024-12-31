@@ -125,23 +125,7 @@ md5sums_toxref %>% # write as dataframe for easy access
 <details><summary>Click for the answer</summary>
 You should get r md5sums_toxref$value as md5sums on both the server and locally
 </details>
- 
-<!-- <details><summary>Click for the answer</summary> -->
 
-<!-- ``` -->
-<!-- # (b) -->
-<!-- # I recommend using Git Bah for Windows [Could not make it work on Win-PowerShell] -->
-<!-- # see: https://stackoverflow.com/questions/478722/what-is-the-best-way-to-calculate-a-checksum-for-a-file-that-is-on-my-machine -->
-<!-- # https://stackoverflow.com/questions/10521061/how-to-get-an-md5-checksum-in-powershell -->
-<!-- ## In GitBash for Windows, this worked: -->
-
-<!-- CertUtil -hashfile toxrefdb_nel_lel_noael_loael_summary_AUG2014_FOR_PUBLIC_RELEASE.csv MD5 > toxrefdb_nel_lel_noael_loael_summary_AUG2014_FOR_PUBLIC_RELEASE_LOCAL.md5 -->
-
-<!-- # Mac/Linux -->
-<!-- md5sum <pathToFileToCheck> > <pathToFileToCheck.md5> -->
-
-<!-- ``` -->
-<!-- </div>  -->
 
  (c) Download the md5 file you just generated on the server (or upload the one you generated locally). Can you think of a way to check in an R script whether they are the same? Write the script and save it in a .R file
 
@@ -177,14 +161,20 @@ serverside$value == local$value[2]
 
 </details>
 </div>
+a.
+```{r}
+md5_3_5 <- tools::md5sum(here::here("data_raw/data_0030/toxrefdb_nel_lel_noael_loael_summary_AUG2014_FOR_PUBLIC_RELEASE.csv")) %>% tibble()
+colnames(md5_3_5) <- "md5"
+write.table(md5_3_5, file = here::here("data/data_0030/local_md5_3_5.txt"), row.names = FALSE)
+```
+b.
+The MD5 sums stay the same as the data isn't altered. MD5 takes the file and "converts" it to a fixed sequence of values, this is called "hashing". If the MD5 were to be different after uploading it to a server, one could assume it's a different version of the file, something is going wrong with the upload/downloading of the file, or a 3rd party could maliciously alter the code.
 
-<div class="question">
-Exercise 3.5
-**project data**
-
-Now look at your last laboratory project and take a look at your folder structure. Clean it! 
-
-</div>
+c.
+Considering the files are created the same way:
+```{r}
+md5_3_5 == md5_3_5
+```
 
 <div class="question">
 Exercise 3.6
@@ -205,23 +195,7 @@ What happens if you change some of the parameters in the `yaml` header of the fi
 
 </div>
 
-<div class="question">
-Exercise 3.7
-**tips**
-
-Please share all tips for fellow students on the prikbord in teams!
-
-</div>
-
-<div class="question">
-Exercise 3.8
-
-Provide study documentation and meta data for your last laboratory project.
-
-<!-- Make `/doc` and `/data` and `data_raw` folders now for all (at least) 3 of your projects this semester. Add a `data_log.xlsx` for the projecticum folder. -->
-
-While you are at it, add `/code` folders for any scripts you write (outside of the RMarkdown files) and `/R` folders for any functions you write.
-</div>
+Changing the parameters of the header changes the output of the rendered document. The reason for this is that these parameters are used as input for some of the code, e.g. `params$country_code`. Especially for larger data sets, this allows for one to render a report with only the data they are interested in. Changing `params$country_code` changes the country used for the report. Changing `from_to_date` changes the dates.
 
 <div class="question">
 Exercise 3.9
@@ -393,3 +367,88 @@ data_tidy_time %>%
 ```
 
 </details>
+
+```{r}
+salmon <- readxl::read_xlsx(here::here("data_raw/data_0030/salmonella CFU kinetics OD600 in LB van ipecs 8okt2020 kleur.xlsx"),
+                            sheet = "All Cycles",
+                            skip = 11)
+colnames(salmon) <- salmon %>% mytoolkitr::usable_colnames()
+colnames(salmon)[1:2] <- c("well", "sample")
+
+condition_salmon <- readxl::read_xlsx(here::here("data_raw/data_0030/salmonella CFU kinetics OD600 in LB van ipecs 8okt2020 kleur.xlsx"),
+                               sheet = "layout",
+                               range = "C4:N4",
+                               .name_repair = "minimal") %>%
+  colnames() %>% tolower() %>% rep(times = 8)
+
+ul_salmon <- readxl::read_xlsx(here::here("data_raw/data_0030/salmonella CFU kinetics OD600 in LB van ipecs 8okt2020 kleur.xlsx"),
+                               sheet = "layout",
+                               range = "C5:N13")
+ul_salmon <- ul_salmon %>% pivot_longer(
+  cols = everything(),
+  names_to = "ul_salmon",
+  values_to = "value")
+```
+The original .xlsx file contains illegal characters, such as spaces. The result is that these column names get read as `1 h 10 min`.
+We remove the spaces to clean up the colnames.
+
+What shape of formatting would you say this data is in? Is the data tidy?
+Write a piece of code that creates a tidy format of this data. You also need to take a look a the sheet called layout to get information on the samples. Try generating a manual data frame that has 96 rows and a code for each sample. The experiment has been performed in duplo, so for each experimental condition there are two samples.
+Now join your sample data dataframe to the raw data.
+```{r}
+ul_salmon <- mutate(ul_salmon, "well" = salmon$well)
+ul_salmon <- ul_salmon[2:3]
+colnames(ul_salmon) <- c("ul_salmon", "well")
+  
+salmon_join <-
+  left_join(x = salmon,
+          y = ul_salmon,
+          by = "well")
+
+# move ul_salmon
+salmon_join <- salmon_join %>% relocate("ul_salmon", .before = `0h`)
+
+salmon_tidy <-
+  salmon_join %>%
+  pivot_longer(names_to = "time",
+               values_to = "value",
+               cols = `0h`:`24h5min`)
+
+salmon_tidy$sample %>% gsub("Sample ",
+                            replacement = "")
+# remove "sample "
+salmon_tidy$sample <- 
+  gsub(pattern = "Sample ",
+     replacement = "",
+     salmon_tidy$sample)
+
+# time sortable
+salmon_tidy <- salmon_tidy %>%
+  mutate(time_2 = gsub("(\\d+h)$", "\\10min", time))
+
+# hours
+salmon_tidy <- salmon_tidy %>%
+  mutate(hours = as.numeric(sub("h.*", "", time_2)))
+
+# mins
+salmon_tidy <- salmon_tidy %>%
+  mutate(
+    minutes = as.numeric(ifelse(grepl("min", time_2), 
+                                sub(".*h(\\d+)min", "\\1", time_2), 
+                                0))
+  )
+
+# total time
+salmon_tidy <- salmon_tidy %>%
+  mutate(time_minutes = hours * 60 + minutes)
+
+salmon_tidy <- salmon_tidy[c(1:3, 5, 6, 9)]
+is.na.data.frame(salmon_tidy) %>% grep(pattern = TRUE)
+```
+Export the data as a .csv file.
+Write an appropriate README.txt file that accompanies this exported csv file. Save both in your data folder of your course project. (make this folder if you don’t have it yet).
+```{r}
+#| eval: false
+salmon_tidy %>% write_csv(here::here("data/data_0030/salmonella.csv"))
+```
+

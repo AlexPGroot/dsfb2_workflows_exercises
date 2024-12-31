@@ -1,0 +1,23 @@
+Folder: data_0040
+Description: contains input data for 004_Reproducible_research.qmd
+
+###################################################################################################
+
+File: FancySuppTable2.xls
+Example file for exercise downloaded:
+download.file(url = "http://genesdev.cshlp.org/content/suppl/2009/06/11/gad.1806309.DC1/FancySuppTable2.xls",
+              destfile = here::here("data_raw/data_0040/FancySuppTable2.xls"))
+
+###################################################################################################
+
+File: 13059_2016_1044_MOESM1_ESM.xlsx
+Downloaded from: https://ndownloader.figstatic.com/files/7148432
+Used in Exercise 4.3
+
+###################################################################################################
+
+File: Bilodeau_Supp_Table_11.xls
+Downloaded from:
+download.file(url = "http://genesdev.cshlp.org/content/suppl/2009/11/03/23.21.2484.DC2/Bilodeau_Supp_Table_11.xls",
+              destfile = here::here("data_raw/data_0040/Bilodeau_Supp_Table_11.xls"))
+Used in Exercise 4.3

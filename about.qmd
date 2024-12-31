@@ -2,8 +2,6 @@
 title: "About"
 ---
 
-About this site
+Exercises website for dsfb2 Workflows.
 
-```{r}
-1 + 1
-```
+Made in Quarto.

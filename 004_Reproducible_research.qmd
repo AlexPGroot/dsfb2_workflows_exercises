@@ -1,0 +1,165 @@
+---
+title: "Lesson 4 Reproducible Research"
+---
+
+```{r library}
+#| message: false
+library(readxl)
+library(here)
+library(tidyverse)
+library(gt)
+```
+
+<div class="question">
+Exercise 4.1
+
+**Answer the following questions**
+
+(A) What was the reason for retracting this [paper](https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(20)31180-6/fulltext)?
+
+```{r, include=FALSE, eval=FALSE}
+# <p style="font-size:18px">_"Our independent peer reviewers informed us that Surgisphere would not transfer the full dataset, client contracts, and the full ISO audit report to their servers for analysis as such transfer would violate client agreements and confidentiality requirements"_</p>
+# 
+#  - Company Surgisphere ('data owner') did not share raw data
+#  - At time of publication (raw) data and analysis (code) was not included in the manuscript
+#  - The authors initiated the retract
+# 
+# <p style="font-size:14px">https://www.sciencemag.org/news/2020/06/two-elite-medical-journals-retract-coronavirus-papers-over-data-integrity-questions</p>
+```
+
+(B) Why is the retraction in itself a problem?
+
+```{r, include = FALSE, eval=FALSE}
+ # >- Scientific conclusions get picked up by the media, retracting statements is difficult
+ # >- The credibility of the Journal, the researchers and the affiliated institutions are at stake (people got sacked over this!)
+ # >- Clinical studies to hydroxy(choloroquine) were halted because of this paper 
+ # >- The credibility of the company Surgisphere is at stake (they should have prevented this...)
+ # >- The credibility of Science as a whole is at stake ('in the eye of the beholder')
+```
+
+(C)  In the sense that we defined above, does The Lancet adhere to Reproducible (Open) Science? Why does it / Why not, what is missing?
+
+</div>
+A.
+The research was performed with data provided by the company Surgisphere based in Chicago, even though this dataset contained errors the authors initially stood by their findings after fixes. The published paper was later retracted as the company was unwilling to share their data as "such transfer would violate client agreements and confidentiality requirements".
+
+B.
+Retracting a paper in the first place does not do much depending on the situation, as the information is already out there. Considering the situation around the research was highly political, news providers would whose political views aligned with the research would talk about the findings regardless of the retract. <br><br>Next everyone who was involved has their credibility destroyed in the eyes of the public.
+The company who provided the erroneous data should not have made this mistake and not providing the data due to confidentiality makes them look even worse. The researchers using the data should have been more skeptical about the data. While it could be argued that the paper did no harm because it reports findings about heart issues, its credibility damage causes people to lose trust in the author's research entirely. This then causes investors to pull out, people lose funding, lose jobs, etc.
+C.
+Had The Lancet and the paper adhered to open science, there would've been concerns raised by peer-reviewers prior to publication. Since the data access is missing this practically invalidates the availability of other aspects such as reproducibility and code.
+
+<div class="question">
+Exercise 4.2
+
+**Reading a strangely formatted column from an Excel file**
+
+ 1. From within R, try downloading the following file: 
+ http://genesdev.cshlp.org/content/suppl/2009/06/11/gad.1806309.DC1/FancySuppTable2.xls
+ Spend 5-10 minutes on trying to accomplish this. Start for instance with `read_excel( path ="http://genesdev.cshlp.org/content/suppl/2009/06/11/gad.1806309.DC1/FancySuppTable2.xls", sheet = 1)` and Google for possible solutions from there.
+ 1. What problems do you encounter, when trying to import this Excel file using `{readxl}`?
+ 1. Perform a manual download of this file by going [here:](http://genesdev.cshlp.org/content/suppl/2009/06/11/gad.1806309.DC1). You need the file under the link `Supp Table 2.xls`
+ 1. Import the manually downloaded Excel file into R
+ 1. Considering the steps you just took, why is manually downloading and importing this file a problem with regard to open science?
+</div>
+
+```{r}
+#| eval: false
+download.file(url = "http://genesdev.cshlp.org/content/suppl/2009/06/11/gad.1806309.DC1/FancySuppTable2.xls",
+              destfile = here::here("data_raw/data_0040/FancySuppTable2.xls"))
+supptable_raw <- readxl::read_xls(path = here::here("data_raw/data_0040/FancySuppTable2.xls"), sheet = 1)
+```
+
+We can import the data by using `utils::download.file()` instead. <br>
+The issues with manually downloading and importing files is that extra steps such as these allow for more angles where something could go wrong and thus impede the data loading process, which would technically mean the data is "open" but making it hard to access goes against the principle of open data. While this url and website are still decently clear when you know what to look for, it's not optimal.
+
+<div class="question">
+Exercise 4.3
+ 
+ 1. Download [this file](https://ndownloader.figstatic.com/files/7148432)
+ 1. Open the file and compare the contents of the file to the Supplementary table shown [here](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1044-7#Sec1). (click on additional file 1) Look specifically at the column `Example Gene Name Conversion`. What do you observe? Why do you think this is happening?
+ 1. Look at this article in the Microsoft help: https://support.microsoft.com/en-us/office/stop-automatically-changing-numbers-to-dates-452bd2db-cc96-47d1-81e4-72cec11c4ed8
+ 1. Change the column `Example Gene Name Conversion` in the file 
+[here](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1044-7#Sec1). to text. 
+ 1. Change the column named `GENE SYMBOL` in [this file](http://genesdev.cshlp.org/content/suppl/2009/11/03/23.21.2484.DC2/Bilodeau_Supp_Table_11.xls) to text. (from the previous exercise)
+ 1. Now try to find the wrongly converted gene called `40059` in this data file
+ 1. On the basis of your observations in this exercise: what are your conclusions about using Excel. How could you make the use of Excel _safer_ for data collection and analysis? What would you recommend your peers? Write (in Rmd) a short recommendation on the safe use of Excel for data collection (min 200 words). Keep this advice around! If you plan on being the person at a lab that "is quite good with data" or helps out with data analysis, you *will* use this in the future.
+
+```{r, parse_failure, include=FALSE, eval=FALSE}
+url <- c("http://genesdev.cshlp.org/content/suppl/2009/06/11/gad.1806309.DC1/FancySuppTable2.xls")
+
+download.file(
+  url = url,
+  destfile = "FancySuppTable2.xls"
+  )
+
+fancy_supp <- read_csv(
+  here::here(
+    "FancySuppTable2.xls"
+  )
+)
+
+url2 <- c("http://genesdev.cshlp.org/content/suppl/2009/11/03/23.21.2484.DC2/Bilodeau_Supp_Table_11.xls")
+
+download.file(
+  url = url2,
+  destfile = "bilodeau.xls"
+  )
+
+bilodeau_supp <- readxl::read_xls(
+  here::here(
+    "bilodeau.xls"
+  )
+)
+
+# Error: 
+#...\bilodeau.xls
+#   libxls error: Unable to open file
+```
+
+</div>
+Excel autoformatting destroys the data; if it recognises certain values, it will try to change them. One of those autoformatting are seen when opening the xlsx file; some example gene names are converted to dates.
+
+```{r}
+raw_MOESM1_tibble <- readxl::read_xlsx(here::here("data_raw/data_0040/13059_2016_1044_MOESM1_ESM.xlsx"))
+```
+`readxl::read_xlsx` converts the `Example Gene Name Conversion` to `<chr>`
+
+```{r}
+#| eval: false
+download.file(url = "http://genesdev.cshlp.org/content/suppl/2009/11/03/23.21.2484.DC2/Bilodeau_Supp_Table_11.xls",
+              destfile = here::here("data_raw/data_0040/Bilodeau_Supp_Table_11.xls"))
+```
+
+Changing the column using LibreOffice ctrl+1, format to text works.
+
+```{r}
+raw_Bilodeau_tibble <- readxl::read_xls(here::here("data_raw/data_0040/Bilodeau_Supp_Table_11.xls"), skip = 2)
+
+raw_MOESM1_tibble %>% filter(`Example Gene Name Conversion` == "40059") %>% gt::gt()
+raw_Bilodeau_tibble %>% filter(`GENE SYMBOL` == 40059) %>% gt::gt()
+```
+
+The safest way to use Excel for data collection and analysis is by not using it. There are also options for globally disabling auto-formatting, which would be the recommended way to use it if necessary. Not keeping the auto-formatting in mind when utilizing Excel could lead to loss of data as for example some gene names get converted to dates and floating-point numbers. These gene ids for example are used as supplementary data tables for what is supposed to be an accessible resource, however conversion of names make these impossible to use. Selecting a column and changing its format settings in Excel to text can prevent the changing by the auto-formatting option, which is recommended. While the earlier mentioned global settings exist it is recommended to check these settings work properly when inputting data or else to format manually.
+
+<div class="question">
+Exercise 4.4
+
+**Mind the variability per subject, what do you see?**
+
+ (A) Can you say something about within-subject variability (note 'Mister Blue')?
+ (B) Can you say something about between-subject variability (note 'Mister Green', vs 'Mister Black')?
+ (C) Which chair type takes, on average the biggest effort to arise from?
+ (D) Looking at the code, why do you think the x-axis is not displaying the `Chair type` in a numeric order?
+ 
+</div>
+
+A.
+Mister Blue often sits at the top end of the scale, requiring a larger amount of effort to get out of the chairs.
+B.
+Green and Black are often spread apart on the graph, one requiring no effort and the other requiring more effort to get out of the chair.
+C.
+Chair type T2.
+D.
+The x-axis is not displaying the chair type in numeric order because it's being ordered by the input of the x-axis data.
+`aes(x = reorder(Type, effort)` It reorders the input data `Type` by `effort`.The result is that the data shows an increasing scale of effort.
