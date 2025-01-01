@@ -5,6 +5,8 @@ format:
     css: css/index.css
 ---
 
+This Quarto website contains the exercises for DSFB2 Workflows
+
 <div class="index-box">
 
 <a href= 003_Data_management.qmd>003 Data management</a>
